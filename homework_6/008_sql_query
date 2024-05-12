@@ -1,0 +1,11 @@
+SELECT t.name as teacher_name, 
+       sub.name as subject,
+       CAST(AVG(g.grade) as DECIMAL (10, 3)) as average_grade
+FROM teachers t
+    INNER JOIN subjects sub
+      ON t.id=sub.teacher_id
+    INNER JOIN grades g
+      ON sub.id=g.subject_id
+   
+GROUP BY t.name, sub.name
+ORDER BY t.name, sub.name;

@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8000"  # Change this line to use a different local port, like 8080
+    depends_on:
+      db:
+        condition: service_healthy
+    #command: ["python", "init_db.py"]
+
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5433:5432"  # Map host port 5433 to container port 5432
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    environment:
+      POSTGRES_PASSWORD: mar123@@@
+      POSTGRES_USER: marina_admin  # Add the PostgreSQL username
+      POSTGRES_DB: homework_6  # Add the PostgreSQL database name
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+      
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"  # Change this line to use a different local port, like 8081
+
+#  data_inserter:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    restart: always
+#    depends_on:
+#      db:
+#        condition: service_healthy
+#    command: ["python", "init_db.py"] 
