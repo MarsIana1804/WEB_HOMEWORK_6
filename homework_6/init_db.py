@@ -4,7 +4,7 @@ import random
 from datetime import datetime, timedelta
 
 
-# Function to generate random data using Faker
+# Function to generate random data using Faker test_comment. 
 def generate_fake_data():
     students = [(fake.name(), random.randint(1, 3)) for _ in range(30)]
     groups = [(fake.company(),) for _ in range(3)]
