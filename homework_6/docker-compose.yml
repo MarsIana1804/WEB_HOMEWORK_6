@@ -4,11 +4,18 @@ services:
   web:
     build: .
     ports:
-      - "8080:8000"  # Change this line to use a different local port, like 8080
+      - "8080:8000"  # Map host port 8080 to container port 8000
     depends_on:
       db:
         condition: service_healthy
-    #command: ["python", "init_db.py"]
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: homework_6
+      POSTGRES_USER: marina_admin
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password  # Use secret for password
+    secrets:
+      - db_password
 
   db:
     image: postgres
@@ -17,11 +24,12 @@ services:
       - "5433:5432"  # Map host port 5433 to container port 5432
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-
     environment:
-      POSTGRES_PASSWORD: mar123@@@
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
       POSTGRES_USER: marina_admin  # Add the PostgreSQL username
       POSTGRES_DB: homework_6  # Add the PostgreSQL database name
+    secrets:
+      - db_password
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 1s
@@ -32,14 +40,8 @@ services:
     image: adminer
     restart: always
     ports:
-      - "8081:8080"  # Change this line to use a different local port, like 8081
+      - "8081:8080"  # Map host port 8081 to container port 8080
 
-#  data_inserter:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    restart: always
-#    depends_on:
-#      db:
-#        condition: service_healthy
-#    command: ["python", "init_db.py"] 
+secrets:
+  db_password:
+    file: ./db_password.txt
